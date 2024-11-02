@@ -136,8 +136,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Django5 Test Swagger API',
-    'DESCRIPTION': 'Django5 Test Swagger API description',
+    'TITLE': 'pre-version all-in-one',
+    'DESCRIPTION': 'Test my api bro',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }

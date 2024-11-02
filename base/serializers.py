@@ -13,3 +13,9 @@ class ArticleCreateSerializer(ModelSerializer):
     class Meta:
         model = Article
         fields = ['content']
+
+
+class ArticleUpdateSerializer(ModelSerializer):
+    class Meta:
+        model = Article
+        fields = ['content']
