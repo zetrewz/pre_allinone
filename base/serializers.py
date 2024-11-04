@@ -15,7 +15,7 @@ class ArticleListSerializer(ModelSerializer):
 class ArticleCreateSerializer(ModelSerializer):
     class Meta:
         model = Article
-        fields = ['content']
+        fields = ['content', 'is_draft']
 
 
 class ArticleUpdateSerializer(ModelSerializer):

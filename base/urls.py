@@ -1,7 +1,7 @@
 from django.urls import path
 
 from base.views import ArticleListView, ArticleCreateView, ArticleDetailView, ArticleUpdateView, ArticleDeleteView, \
-    ArticleLikeView, ArticleDislikeView, CommentCreateView, CommentListView, CommentUpdateView
+    ArticleLikeView, ArticleDislikeView, CommentCreateView, CommentListView, CommentUpdateView, TopicArticlesView
 
 urlpatterns = [
     path('list/', ArticleListView.as_view(), name='article-list'),
@@ -14,7 +14,7 @@ urlpatterns = [
 
     path('comment/list/<int:article_id>/', CommentListView.as_view(), name='comment-list'),
     path('comment/create/<int:article_id>/', CommentCreateView.as_view(), name='comment-create'),
-    path('comment/create/parent/<int:article_id>/<int:parent_id>/', CommentCreateView.as_view(),
-         name='comment-create-p'),
     path('comment/update/<int:pk>/', CommentUpdateView.as_view(), name='comment-update'),
+
+    path('topic/<str:name>/', TopicArticlesView.as_view(), name='topic-articles'),
 ]

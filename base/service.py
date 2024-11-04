@@ -16,7 +16,6 @@ class ArticleService:
         else:
             self.article.likes.add(self.user)
 
-    #
     def toggle_dislike(self):
         if self.article.likes.filter(pk=self.user.pk).exists():
             self.article.likes.remove(self.user)

@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Model, ForeignKey, CASCADE, TextField, ManyToManyField
-from django.db.models.fields import DateTimeField, BooleanField
+from django.db.models import Model, ForeignKey, CASCADE, TextField, ManyToManyField, SET_NULL
+from django.db.models.fields import DateTimeField, BooleanField, CharField
 
 User = get_user_model()
 
@@ -8,8 +8,10 @@ User = get_user_model()
 class Article(Model):
     user = ForeignKey(User, on_delete=CASCADE, related_name='articles')
     content = TextField(max_length=1000)
+    topic = ForeignKey('Topic', on_delete=SET_NULL, blank=True, null=True, related_name='articles')
     likes = ManyToManyField(User, blank=True, related_name='likes')
     dislikes = ManyToManyField(User, blank=True, related_name='dislikes')
+    is_draft = BooleanField(default=True)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
 
@@ -28,3 +30,10 @@ class Comment(Model):
 
     def __str__(self):
         return f"article {self.article.pk} {self.user} pk: {self.pk}"
+
+
+class Topic(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.name}"

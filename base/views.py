@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.response import Response
@@ -12,13 +12,16 @@ from base.serializers import ArticleListSerializer, ArticleCreateSerializer, Art
 from base.service import ArticleService
 
 article_tag = extend_schema(tags=['Articles'])
-comment_tag = extend_schema(tags=['Comment'])
+comment_tag = extend_schema(tags=['Comments'])
 
 
 @article_tag
 class ArticleListView(ListAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleListSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(is_draft=False)
 
 
 @article_tag
@@ -82,18 +85,25 @@ class CommentListView(ListAPIView):
         return self.queryset.filter(article_id=self.kwargs.get('article_id'))
 
 
-@comment_tag
-class CommentCreateView(CreateAPIView):
-    queryset = Comment.objects.all()
+@extend_schema(
+    tags=['Comments'],
+    parameters=[OpenApiParameter(name="parent_id", type=int, required=False)],
+)
+class CommentCreateView(APIView):
     serializer_class = CommentCreateSerializer
 
-    def perform_create(self, serializer):
-        article = get_object_or_404(Article, pk=self.kwargs.get('article_id'))
-        parent_comment = None
-        parent_id = self.kwargs.get('parent_id')
-        if parent_id:
-            parent_comment = get_object_or_404(Comment, pk=parent_id)
-        serializer.save(user=self.request.user, article=article, parent_comment=parent_comment)
+    def post(self, request, article_id):
+        article = get_object_or_404(Article, pk=article_id)
+        parent_id = request.query_params.get('parent_id')
+        parent_comment = get_object_or_404(Comment, pk=parent_id)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(
+                user=self.request.user,
+                article=article,
+                parent_comment=parent_comment
+            )
+            return Response({"detail": "Comment created successfully"}, status=status.HTTP_200_OK)
 
 
 @comment_tag
@@ -101,3 +111,13 @@ class CommentUpdateView(UpdateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentUpdateSerializer
     permission_classes = [IsOwnerPermission]
+
+# --------------------------------------------
+
+
+class TopicArticlesView(ListAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleListSerializer
+
+    def get_queryset(self):
+        return Article.objects.filter(topic__name=self.kwargs['name'])
